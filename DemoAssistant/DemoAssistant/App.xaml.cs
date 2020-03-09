@@ -16,8 +16,6 @@ namespace DemoAssistant
         {
             InitializeComponent();
 
-            DependencyService.Register<MockDataStore>();
-
             DependencyService.Register<DeviceList>();
             DependencyService.Register<ActiveDeviceList>();
 
