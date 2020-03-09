@@ -1,5 +1,9 @@
-﻿using System;
+﻿using DemoAssistant.Services;
+using ExpoHelpers;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -13,6 +17,13 @@ namespace DemoAssistant.Views
         public MainPage()
         {
             InitializeComponent();
+
+            this.ItemsSource = DependencyService.Get<ActiveDeviceList>().ActiveDevices;
+        }
+
+        public async void SettingsClicked(object sender, EventArgs args)
+        {
+            await Navigation.PushModalAsync(new NavigationPage(new SettingsPage()));
         }
     }
 }

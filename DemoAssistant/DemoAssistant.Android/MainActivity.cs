@@ -6,6 +6,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Xamarin.Forms;
+using DemoAssistant.Services;
 
 namespace DemoAssistant.Droid
 {
@@ -14,8 +16,13 @@ namespace DemoAssistant.Droid
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            Forms.SetFlags("StateTriggers_Experimental");
+
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
+
+            DeviceListStorage.Context = this.ApplicationContext;
+            DependencyService.Register<DeviceListStorage>();
 
             base.OnCreate(savedInstanceState);
 

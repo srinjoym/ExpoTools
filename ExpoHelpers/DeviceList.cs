@@ -30,8 +30,6 @@ namespace ExpoHelpers
 
     /// <summary>
     /// Class to maintain a list of all the devices we will ever deal with.
-    /// Also keeps "check lists" of devices for what the user selects in
-    /// the UI.  A purist might put that functionality in a different class
     /// </summary>
     public class DeviceList
     {
@@ -39,21 +37,6 @@ namespace ExpoHelpers
 
         public IList<DeviceInformation> Devices { get; private set; }
 
-        private int deviceCheckListCount = 0;
-        public int DeviceCheckListCount
-        {
-            get { return this.deviceCheckListCount; }
-            set
-            {
-                if(this.deviceCheckListCount != value)
-                {
-                    this.deviceCheckListCount = value;
-                    this.CreateDeviceCheckLists();
-                }
-            }
-        }
-
-        private List<List<DeviceCheckListItemViewModel>> deviceCheckLists;
 
         public void LoadDeviceList(Stream deviceListStream)
         {
@@ -113,71 +96,12 @@ namespace ExpoHelpers
             }
 
             this.Devices = newDeviceList;
-            this.CreateDeviceCheckLists();
             OnStatusUpdate(DeviceListStatus.ListLoaded);
         }
 
         private void OnStatusUpdate(DeviceListStatus status, string message = null)
         {
             this.StatusUpdate?.Invoke(this, new DeviceListStatusArgs(status, message ?? string.Empty));
-        }
-
-        private void CreateDeviceCheckLists()
-        {
-            if(this.Devices == null)
-            {
-                // Haven't loaded things yet.
-                // This will get called again after we load a device list.
-                return;
-            }
-
-            this.deviceCheckLists = new List<List<DeviceCheckListItemViewModel>>(this.deviceCheckListCount);
-
-            for (int deviceListIndex = 0; deviceListIndex < this.deviceCheckListCount; deviceListIndex++)
-            {
-                var checkList = new List<DeviceCheckListItemViewModel>(this.Devices.Count);
-                foreach (var device in this.Devices)
-                {
-                    checkList.Add(new DeviceCheckListItemViewModel(device));
-                }
-                this.deviceCheckLists.Add(checkList);
-            }
-        }
-
-        public void UpdateCheckListItems(int checkListIndex, string[] selectedDevices)
-        {
-            var checkList = this.deviceCheckLists[checkListIndex];
-
-            foreach(var item in checkList)
-            {
-                item.IsChecked = selectedDevices.Contains(item.Device.Address);
-            }
-        }
-
-        public IList<DeviceCheckListItemViewModel> GetDeviceCheckList(int deviceCheckListIndex)
-        {
-            return this.deviceCheckLists[deviceCheckListIndex];
-        }
-
-        public string[] GetCheckedItems(int deviceCheckListIndex)
-        {
-            var checkList = this.deviceCheckLists[deviceCheckListIndex];
-
-            int checkedItemsCount = 0;
-            foreach(var item in checkList)
-            {
-                checkedItemsCount += item.IsChecked ? 1 : 0;
-            }
-
-            var retval = new string[checkedItemsCount];
-            foreach(var item in checkList)
-            {
-                if (item.IsChecked)
-                {
-                    retval[--checkedItemsCount] = item.Device.Address;
-                }
-            }
-            return retval;
         }
 
         public DeviceInformation TryFind(string address)

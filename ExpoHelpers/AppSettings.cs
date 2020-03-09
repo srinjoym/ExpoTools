@@ -16,56 +16,16 @@ namespace ExpoHelpers
 
     public class AppSettings
     {
-        private const string selectedDevicesBase = "SelectedDeviceSet";
-        private static string SelectedDeviceKey(int setIndex) { return selectedDevicesBase + setIndex; }
-        private const char selectedDeviceSeperator = '|';
-
         private const string appPackage = "AppPackage";
         private static string AppPackageNameKey(AppPackageSetting app) { return appPackage + app.ToString() + "PackageName"; }
         private static string AppIdKey(AppPackageSetting app) { return appPackage + app.ToString() + "AppId"; }
 
-        public static string[] GetSelectedDevices(int setIndex)
+
+        private static string selectedDevices = string.Empty;
+        public static string SelectedDevices
         {
-            var key = SelectedDeviceKey(setIndex);
-
-            string selectedDevicesString;
-            GetLocalSetting(out selectedDevicesString, null, key);
-            if(!string.IsNullOrEmpty(selectedDevicesString))
-            {
-                var addresses = selectedDevicesString.Split(selectedDeviceSeperator);
-                var selectedDevices = new string[addresses.Length];
-                for (int i = 0; i < addresses.Length; i++)
-                {
-                    selectedDevices[i] = addresses[i];
-                }
-                return selectedDevices;
-            }
-
-            return new string[0];
-        }
-
-
-        public static void SetSelectedDevices(int setIndex, string[] selectedDevices)
-        {
-            var key = SelectedDeviceKey(setIndex);
-
-            if (selectedDevices == null || selectedDevices.Length == 0)
-            {
-                Preferences.Remove(key);
-                return;
-            }
-
-            var sb = new StringBuilder();
-            for (int i = 0; i < selectedDevices.Length; i++)
-            {
-                sb.Append(selectedDevices[i].ToString());
-                if (i < (selectedDevices.Length - 1))
-                {
-                    sb.Append(selectedDeviceSeperator);
-                }
-            }
-
-            Preferences.Set(key, sb.ToString());
+            get { GetLocalSetting(out selectedDevices, string.Empty); return selectedDevices; }
+            set { SetLocalSetting(ref selectedDevices, value); }
         }
 
         private static string defaultUserName = string.Empty;
@@ -143,6 +103,13 @@ namespace ExpoHelpers
         {
             get { GetLocalSetting(out personCount, 0); return personCount; }
             set { SetLocalSetting(ref personCount, value); }
+        }
+
+        private static bool showLog;
+        public static bool ShowLog
+        {
+            get { GetLocalSetting(out showLog, false); return showLog; }
+            set { SetLocalSetting(ref showLog, value); }
         }
 
         public static void GetAppPackageInfo(AppPackageSetting app, out string appId, out string packageName)

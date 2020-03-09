@@ -1,3 +1,4 @@
 using Xamarin.Forms.Xaml;
 
-[assembly: XamlCompilation(XamlCompilationOptions.Compile)]
+// Currently seeing compile errors when this is set to Compile
+[assembly: XamlCompilation(XamlCompilationOptions.Skip)]

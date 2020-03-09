@@ -5,30 +5,20 @@
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
             mc:Ignorable="d"
             xmlns:views="clr-namespace:DemoAssistant.Views"
-            x:Class="DemoAssistant.Views.MainPage">
+            x:Class="DemoAssistant.Views.MainPage"
+            >
 
-    <TabbedPage.Children>
-        <NavigationPage Title="Browse">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_feed.png"/>
-                </OnPlatform>
-            </NavigationPage.Icon>
-            <x:Arguments>
-                <views:ItemsPage />
-            </x:Arguments>
-        </NavigationPage>
-        
-        <NavigationPage Title="About">
-            <NavigationPage.Icon>
-                <OnPlatform x:TypeArguments="FileImageSource">
-                    <On Platform="iOS" Value="tab_about.png"/>
-                </OnPlatform>
-            </NavigationPage.Icon>
-            <x:Arguments>
-                <views:AboutPage />
-            </x:Arguments>
-        </NavigationPage>
-    </TabbedPage.Children>
-    
+    <TabbedPage.ItemTemplate>
+        <DataTemplate>
+            <NavigationPage Title="{Binding Path=Id}">
+                <x:Arguments>
+                    <views:ActiveDevicePage>
+                        <views:ActiveDevicePage.ToolbarItems>
+                             <ToolbarItem Text="&#x2699; Settings" Clicked="SettingsClicked" Order="Secondary" />
+                        </views:ActiveDevicePage.ToolbarItems>
+                    </views:ActiveDevicePage>
+                </x:Arguments>
+            </NavigationPage>
+        </DataTemplate>
+    </TabbedPage.ItemTemplate>
 </TabbedPage>

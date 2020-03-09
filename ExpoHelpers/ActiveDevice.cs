@@ -324,6 +324,7 @@ namespace ExpoHelpers
                             this.UserName,
                             this.Password);
                     this.devicePortal = new DevicePortal(this.devicePortalConnection);
+                    this.devicePortal.UnvalidatedCert += (sender, certificate, chain, sslPolicyErrors) => true; // Allow unvalidated certs
                     this.devicePortal.ConnectionStatus += DevicePortalConnectionStatus;
                 }
 

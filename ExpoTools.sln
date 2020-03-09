@@ -6,6 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoAssistant.UWP", "DemoAssistant\DemoAssistant.UWP\DemoAssistant.UWP.csproj", "{D426E939-C2D3-48F9-AF15-E27C4095F921}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoAssistant.Android", "DemoAssistant\DemoAssistant.Android\DemoAssistant.Android.csproj", "{D01F4204-F214-459E-860E-ADF7ADBAD254}"
+	ProjectSection(ProjectDependencies) = postProject
+		{93144B02-7122-410E-ABF9-6BAC0D519785} = {93144B02-7122-410E-ABF9-6BAC0D519785}
+		{4BDDE213-0F51-4BF4-83FB-3C279FC46EB7} = {4BDDE213-0F51-4BF4-83FB-3C279FC46EB7}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoAssistant.iOS", "DemoAssistant\DemoAssistant.iOS\DemoAssistant.iOS.csproj", "{5D87AF4A-75E2-40A3-A6E6-FFDE54BE85AC}"
 EndProject
@@ -15,7 +19,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "WindowsDevicePortalWrapper.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsDevicePortalWrapper.NetStandard", "..\WindowsDevicePortalWrapper\WindowsDevicePortalWrapper\WindowsDevicePortalWrapper.NetStandard\WindowsDevicePortalWrapper.NetStandard.csproj", "{93144B02-7122-410E-ABF9-6BAC0D519785}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpoHelpers", "ExpoHelpers\ExpoHelpers.csproj", "{4BDDE213-0F51-4BF4-83FB-3C279FC46EB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpoHelpers", "ExpoHelpers\ExpoHelpers.csproj", "{4BDDE213-0F51-4BF4-83FB-3C279FC46EB7}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
