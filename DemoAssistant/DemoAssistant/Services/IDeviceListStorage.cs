@@ -10,5 +10,7 @@ namespace DemoAssistant.Services
     public interface IDeviceListStorage
     {
         Task<Stream> GetDeviceListStreamAsync();
+        Task<Stream> GetTestScreenshotStreamAsync();
+
     }
 }

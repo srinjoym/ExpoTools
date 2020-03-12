@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.Res;
+using Android.Graphics.Drawables;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
@@ -30,6 +31,15 @@ namespace DemoAssistant.Droid
 
             AssetManager assets = DeviceListStorage.Context.Assets;
             Stream stream = assets.Open("Test Devices.xml");
+            return stream;
+        }
+
+        public async Task<System.IO.Stream> GetTestScreenshotStreamAsync()
+        {
+            await Task.CompletedTask; // quiet the compiler warning.  Maybe this doesn't need to be async?
+
+            var stream = DeviceListStorage.Context.Resources.OpenRawResource(DemoAssistant.Droid.Resource.Drawable.HLScreenshot2);
+            
             return stream;
         }
     }

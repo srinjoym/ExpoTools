@@ -9,18 +9,6 @@
              x:Name="ActiveDeviceContentPage"
              BindingContextChanged="ActiveDevicePageBindingContextChanged"
              >
-    <ContentPage.Resources>
-        <Style x:Name="LaunchButtonStyle" TargetType="Button">
-            <Setter Property="FontSize" Value="Caption"/>
-            <Setter Property="FontAttributes" Value="None"/>
-        </Style>
-
-        <Style x:Name="RunningAppIndicatorStyle" TargetType="Label">
-            <Setter Property="FontSize" Value="Caption"/>
-            <Setter Property="FontAttributes" Value="Bold"/>
-            <Setter Property="HorizontalOptions" Value="CenterAndExpand"/>
-            <Setter Property="Margin" Value="0,-5,0,0"/>
-        </Style>    </ContentPage.Resources>
     
     <ContentPage.Content>
         <StackLayout x:Name="VisualStateContainer">
@@ -103,71 +91,68 @@
                     </VisualState>
                 </VisualStateGroup>
 
-                <VisualStateGroup x:Name="AppLaunchStateGroup">
-                    <VisualState x:Name="AppLaunchStarted">
-                        <VisualState.Setters>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.BackgroundColor" Value="Yellow"/>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.Text" Value="Launch Attempted"/>
-                        </VisualState.Setters>
-                    </VisualState>
-                    <VisualState x:Name="AppLaunchFailed">
-                        <VisualState.Setters>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.BackgroundColor" Value="Red"/>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.Text" Value="Launch Failed"/>
-                        </VisualState.Setters>
-                    </VisualState>
-                    <VisualState x:Name="AppLaunchSucceeded">
-                        <VisualState.Setters>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.BackgroundColor" Value="Green"/>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.Text" Value="Launch Succeeded"/>
-                        </VisualState.Setters>
-                    </VisualState>
-                    <VisualState x:Name="AppLaunchHidden">
-                        <VisualState.Setters>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.BackgroundColor" Value="{x:Null}"/>
-                            <Setter TargetName="LaunchStatusLabel" Property="Label.Text" Value=""/>
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-
             </VisualStateManager.VisualStateGroups>
             
             
-            <Label Text="{Binding Path=Name,FallbackValue='Device Name'}" VerticalOptions="Center" 
-                HorizontalOptions="CenterAndExpand" Margin="0,10,0,0" />
-            
-            <Grid>
+
+            <Frame x:Name="AppLaunchFrame" BorderColor="Black" BackgroundColor="White"
+                   Padding="5,10,5,10">
+                <Grid>
+                    <Grid.Resources>
+                        <ResourceDictionary>
+                            <Style x:Name="LaunchButtonStyle" TargetType="Button">
+                                <Setter Property="FontSize" Value="Caption"/>
+                                <Setter Property="FontAttributes" Value="None"/>
+                                <Setter Property="Padding" Value="0"/>
+                            </Style>
+
+                            <Style x:Name="RunningAppIndicatorStyle" TargetType="Label">
+                                <Setter Property="FontSize" Value="Caption"/>
+                                <Setter Property="FontAttributes" Value="Bold"/>
+                                <Setter Property="HorizontalOptions" Value="CenterAndExpand"/>
+                                <Setter Property="Margin" Value="0,-5,0,0"/>
+                            </Style>
+                        </ResourceDictionary>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Column="0" Text="Kiosk" Clicked="LaunchKioskAppClick" Style="{StaticResource LaunchButtonStyle}" />
+                    <Button Grid.Column="1" Text="Training" Clicked="LaunchTrainingAppClick" Style="{StaticResource LaunchButtonStyle}" />
+                    <Button Grid.Column="2" Text="Experience" Clicked="LaunchExperienceAppClick" Style="{StaticResource LaunchButtonStyle}" />
+                    <Label Grid.Column="0" Grid.Row="1" x:Name="KioskAppRunning" Text="Running" Style="{StaticResource RunningAppIndicatorStyle}" />
+                    <Label Grid.Column="1" Grid.Row="1" x:Name="TrainingRunning" Text="Running" Style="{StaticResource RunningAppIndicatorStyle}" />
+                    <Label Grid.Column="2" Grid.Row="1" x:Name="ExperienceRunning" Text="Running" Style="{StaticResource RunningAppIndicatorStyle}" />
+                </Grid>
+            </Frame>
+
+            <Grid Margin="0,20,0,0" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Button Grid.Column="0" Text="Kiosk" Clicked="LaunchKioskAppClick" Style="{StaticResource LaunchButtonStyle}" />
-                <Button Grid.Column="1" Text="Training" Clicked="LaunchTrainingAppClick" Style="{StaticResource LaunchButtonStyle}" />
-                <Button Grid.Column="2" Text="Experience" Clicked="LaunchExperienceAppClick" Style="{StaticResource LaunchButtonStyle}" />
-                <Label Grid.Column="0" Grid.Row="1" x:Name="KioskAppRunning" Text="Running" Style="{StaticResource RunningAppIndicatorStyle}" />
-                <Label Grid.Column="1" Grid.Row="1" x:Name="TrainingRunning" Text="Running" Style="{StaticResource RunningAppIndicatorStyle}" />
-                <Label Grid.Column="2" Grid.Row="1" x:Name="ExperienceRunning" Text="Running" Style="{StaticResource RunningAppIndicatorStyle}" />
-            </Grid>
-            
-            
-            <Grid Margin="0,20,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <StackLayout Orientation="Horizontal" Grid.Column="0" HorizontalOptions="Start" Margin="30,0,0,0">
-                    <Label Text="Battery:" FontSize="Title"/>
-                    <Label x:Name="BatteryState" Text="{Binding Path=BatteryStatus,Mode=OneWay,FallbackValue='XX%'}" FontSize="Title" />
+                <StackLayout Orientation="Horizontal" Grid.Column="0" HorizontalOptions="Center" Margin="0,0,0,0">
+                    <Label Text="Battery:" FontSize="Default" HorizontalOptions="Start"/>
+                    <Label x:Name="BatteryState" Text="{Binding Path=BatteryStatus,Mode=OneWay,FallbackValue='XX%'}" FontSize="Default" HorizontalOptions="Start" />
                 </StackLayout>
-                <Label x:Name="OperationIndicator" Grid.Column="1" Text="🔁"  VerticalOptions="Center" HorizontalOptions="CenterAndExpand" FontSize="Title"/>
+                <Label x:Name="OperationIndicator" Grid.Column="1" Text="🔁"  VerticalOptions="Center" HorizontalOptions="Center" FontSize="Title"/>
             </Grid>
 
-            <Label x:Name="LaunchStatusLabel" Text="Nothing" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" HorizontalOptions="Center" WidthRequest="100" HeightRequest="100" BackgroundColor="CornflowerBlue"/>
+            <FlexLayout Wrap="Wrap" JustifyContent="SpaceAround" Margin="0,30,0,0">
+                <Button Text="Screen Shot" Clicked="ScreenShotClick"/>
+                <Button Text="Next" />
+                <Button Text="Reboot" />
+                <Button Text="Stop All Apps" />
+                <Button Text="Restart Device" />
+                <!--<Button Text="Right Arrow" />-->
+
+            </FlexLayout>
 
 
         </StackLayout>

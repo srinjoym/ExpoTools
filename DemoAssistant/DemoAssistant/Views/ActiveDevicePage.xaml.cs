@@ -1,4 +1,5 @@
-﻿using ExpoHelpers;
+﻿using DemoAssistant.Services;
+using ExpoHelpers;
 using Microsoft.Tools.WindowsDevicePortal;
 using System;
 using System.Collections.Generic;
@@ -93,34 +94,30 @@ namespace DemoAssistant.Views
 
         private async void AppLaunchStatusChanged(AppLaunchStatus status)
         {
-            string newState;
+            Color fromColor;
 
             switch (status)
             {
                 default:
                 case AppLaunchStatus.None:
-                    newState = "AppLaunchHidden";
+                    fromColor = Color.White;
                     break;
 
                 case AppLaunchStatus.CommandSent:
-                    newState ="AppLaunchStarted";
+                    fromColor = Color.Yellow;
                     break;
 
                 case AppLaunchStatus.Failed:
-                    newState = "AppLaunchFailed";
+                    fromColor = Color.Red;
                     break;
 
                 case AppLaunchStatus.Succeeded:
-                    newState = "AppLaunchSucceeded";
+                    fromColor = Color.Green;
                     break;
             }
 
-            Debug.WriteLine($"VisualStateManager.GoToState(this.VisualStateContainer, {newState});");
-            ViewExtensions.CancelAnimations(this.LaunchStatusLabel);
-            VisualStateManager.GoToState(this.VisualStateContainer, newState);
-            this.LaunchStatusLabel.Opacity = 1.0;
-            await ViewExtensions.FadeTo(this.LaunchStatusLabel, 0.0, 500);
-
+            ViewExtensions.CancelAnimations(this.AppLaunchFrame);
+            await ColorAnimation.ColorTo(this.AppLaunchFrame, fromColor, Color.White, (color) => this.AppLaunchFrame.BackgroundColor = color, 500);
         }
 
         private async void LaunchKioskAppClick(object sender, EventArgs args)
@@ -141,6 +138,16 @@ namespace DemoAssistant.Views
         private async void LaunchExperienceAppClick(object sender, EventArgs args)
         {
             await this.LaunchApp(AppPackageSetting.ExperienceApp);
+        }
+
+        private async void ScreenShotClick(object sender, EventArgs args)
+        {
+            var image = await this.activeDevice.TakeScreenshotAsync();
+
+            if (image != null)
+            {
+                await Navigation.PushModalAsync(new NavigationPage(new ImageViewer(image)));
+            }
         }
 
         private async Task LaunchApp(AppPackageSetting app)

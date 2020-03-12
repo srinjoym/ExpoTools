@@ -512,7 +512,14 @@ namespace ExpoHelpers
 
                         byte[] fileData = await this.devicePortal.GetMrcFileDataAsync(mostRecentFileInfo.FileName);
                         await this.devicePortal.DeleteMrcFileAsync(mostRecentFileInfo.FileName);
-                        var imageSource = ImageSource.FromStream(() => new MemoryStream(fileData));
+                        
+                        StreamImageSource imageSource = new StreamImageSource() { Stream = (async (c) =>
+                        {
+                            var memoryStream = new MemoryStream(fileData);
+                            await Task.CompletedTask; // quiet compiler warning - probably should use some pragma or something
+                            return memoryStream;
+                        })};
+
                         return imageSource;
                     }
                     catch (Exception e)

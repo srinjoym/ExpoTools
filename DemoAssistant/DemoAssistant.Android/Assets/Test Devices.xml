@@ -3,7 +3,7 @@
   <ConnectionInformation><Address>fake1</Address><Name>Fake 1</Name><Id>F1</Id></ConnectionInformation>
   <ConnectionInformation><Address>fake2</Address><Name>Fake 2</Name><Id>F2</Id></ConnectionInformation>
   <!--  <ConnectionInformation><Address>10.4.20.34</Address><Name>Wired Device 14</Name><Id>14</Id></ConnectionInformation> -->
-  <ConnectionInformation><Address>192.168.1.43</Address><Name>Red</Name><Id>1</Id></ConnectionInformation>
+  <ConnectionInformation><Address>192.168.1.44</Address><Name>Red</Name><Id>1</Id></ConnectionInformation>
   <ConnectionInformation><Address>fake3</Address><Name>Fake 3</Name><Id>F3</Id></ConnectionInformation>
   <ConnectionInformation><Address>fake4</Address><Name>Fake 4</Name><Id>F4</Id></ConnectionInformation>
 <!--  <ConnectionInformation><Address>10.4.20.7</Address><Name>Device 7</Name><Id>7</Id></ConnectionInformation> -->
