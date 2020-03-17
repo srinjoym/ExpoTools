@@ -105,13 +105,6 @@ namespace ExpoHelpers
             set { SetLocalSetting(ref personCount, value); }
         }
 
-        private static bool showLog;
-        public static bool ShowLog
-        {
-            get { GetLocalSetting(out showLog, false); return showLog; }
-            set { SetLocalSetting(ref showLog, value); }
-        }
-
         public static void GetAppPackageInfo(AppPackageSetting app, out string appId, out string packageName)
         {
             GetLocalSetting(out appId, null, AppIdKey(app));

@@ -25,5 +25,10 @@ namespace DemoAssistant.Views
         {
             await Navigation.PushModalAsync(new NavigationPage(new SettingsPage()));
         }
+
+        public async void LogClicked(object sender, EventArgs args)
+        {
+            await Navigation.PushModalAsync(new NavigationPage(new LogView()));
+        }
     }
 }

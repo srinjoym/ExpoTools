@@ -56,7 +56,7 @@ namespace ExpoHelpers
                 {
                     var newDevice = new ActiveDevice(newDeviceInformation);
                     newDevice.GetRunningProcessesOnHeartbeat = true; // maybe just do this with the selected device
-                    newDevice.Log += OnActiveDeviceLog;
+                    newDevice.Log += this.LogDeviceMessage;
                     this.activeDevices.Add(newDevice);
                 }
             }
@@ -107,11 +107,6 @@ namespace ExpoHelpers
                 deviceArray[i] = this.activeDevices[i];
             }
             return deviceArray;
-        }
-
-        private void OnActiveDeviceLog(bool isError, string message)
-        {
-            this.Log?.Invoke(isError, message);
         }
 
         private async void HeartbeatTimerTick()
@@ -197,9 +192,14 @@ namespace ExpoHelpers
             }
         }
 
+        private void LogDeviceMessage(bool isError, string deviceId, string message)
+        {
+            this.Log?.Invoke(isError, deviceId, message);
+        }
+
         private void LogMessage(bool isError, string message)
         {
-            this.Log?.Invoke(isError, $"ActiveDeviceList: {message}");
+            this.Log?.Invoke(isError, null, $"ActiveDeviceList: {message}");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

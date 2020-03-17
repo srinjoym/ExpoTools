@@ -15,6 +15,7 @@
                     <views:ActiveDevicePage>
                         <views:ActiveDevicePage.ToolbarItems>
                              <ToolbarItem Text="&#x2699; Settings" Clicked="SettingsClicked" Order="Secondary" />
+                            <ToolbarItem Text="🌲 Log" Clicked="LogClicked" Order="Secondary" />
                         </views:ActiveDevicePage.ToolbarItems>
                     </views:ActiveDevicePage>
                 </x:Arguments>

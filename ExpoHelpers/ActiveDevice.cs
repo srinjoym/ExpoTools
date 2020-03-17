@@ -38,7 +38,7 @@ namespace ExpoHelpers
         }
     }
 
-    public delegate void LogEventHandler(bool isError, string message);
+    public delegate void LogEventHandler(bool isError, string deviceId, string message);
 
     public delegate void AppLaunchStatusHendler(AppLaunchStatus status);
 
@@ -439,7 +439,7 @@ namespace ExpoHelpers
         /// 
         /// </summary>
         /// <param name="packageName"></param>
-        /// <param name="killBroker">Note that this option disasbles the force kill option (not supported in DPAPI)</param>
+        /// <param name="forceKill"></param>
         /// <returns></returns>
         public async Task TerminateApplicationAsync(string packageName, bool forceKill)
         {
@@ -713,7 +713,7 @@ namespace ExpoHelpers
 
         private void LogMessage(bool isError, string message)
         {
-            this.Log?.Invoke(isError, $"Device: {this.Id}   {message}");
+            this.Log?.Invoke(isError, this.Id, message);
         }
 
         public override string ToString()

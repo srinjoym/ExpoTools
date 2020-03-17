@@ -12,16 +12,6 @@ namespace DemoAssistant.Views
 {
     public partial class SettingsPage : ContentPage
     {
-        public static readonly BindableProperty ShowLogProperty =
-            BindableProperty.Create(nameof(ShowLog), typeof(bool), typeof(SettingsPage), false, BindingMode.TwoWay, null, null);
-        
-        public bool ShowLog
-        {
-            get { return (bool)this.GetValue(ShowLogProperty); }
-            set { this.SetValue(ShowLogProperty, value); }
-        }
-
-
         public static readonly BindableProperty UserNameProperty =
             BindableProperty.Create(nameof(UserName), typeof(string), typeof(SettingsPage));
 
@@ -100,8 +90,6 @@ namespace DemoAssistant.Views
             // Make user explicitly press Cancel or Save
             NavigationPage.SetHasBackButton(this, false);
 
-            this.ShowLog = AppSettings.ShowLog;
-
             this.UserName = AppSettings.DefaultUserName; 
             this.Password = AppSettings.DefaultPassword; 
 
@@ -131,14 +119,6 @@ namespace DemoAssistant.Views
             return true; // stop back navigation
         }
 
-        public void ClearLogClick(object sender, EventArgs args)
-        {
-        }
-
-        public void CopyLogClick(object sender, EventArgs args)
-        {
-        }
-        
         private async void SelectActiveDevicesClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new SelectActiveDevicesPage(this.deviceCheckList.Items));
@@ -151,8 +131,6 @@ namespace DemoAssistant.Views
 
         public async void SaveClicked(object sender, EventArgs args)
         {
-            AppSettings.ShowLog = this.ShowLog;
-
             AppSettings.DefaultUserName = this.UserName;
             AppSettings.DefaultPassword = this.Password;
 

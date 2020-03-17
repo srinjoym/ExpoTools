@@ -18,8 +18,11 @@ namespace DemoAssistant
 
             DependencyService.Register<DeviceList>();
             DependencyService.Register<ActiveDeviceList>();
+            DependencyService.Register<LoggingService>();
 
             MainPage = new MainPage();
+
+            DependencyService.Get<ActiveDeviceList>().Log += DependencyService.Get<ILoggingService>().LogDeviceMessage;
             
             Task.Run(this.InitAsync);
         }
@@ -35,13 +38,6 @@ namespace DemoAssistant
             var deviceCheckList = new DeviceCheckList();
             deviceCheckList.Reset(deviceList.Devices);
             deviceCheckList.UpdateFromString(AppSettings.SelectedDevices);
-
-            // Temp code to be sure we have at least two devices - otherwise the settings menu button will be hidden 
-            if(deviceCheckList.Items.Count > 1 && deviceCheckList.GetCheckedDeviceCount() == 0)
-            {
-                deviceCheckList.Items[0].IsChecked = true;
-                deviceCheckList.Items[1].IsChecked = true;
-            }
 
             await activeDeviceList.UpdateActiveDevicesAsync(false, deviceCheckList.GetCheckedDevices());
         }
