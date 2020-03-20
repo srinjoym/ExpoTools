@@ -58,7 +58,15 @@
                         </StackLayout>
                     </ViewCell>
                 </TableSection>
-                
+                <TableSection Title="Optional Buttons">
+                    <ViewCell>
+                        <StackLayout Margin="5,0,0,0">
+                            <Label LineBreakMode="WordWrap" Text="{Binding Path=OptionalButtonsText,Mode=OneWay,FallbackValue='Reboot, C Key'}"/>
+                            <Button Text="Select" Clicked="SelectOptionalButtonsClicked" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+                        </StackLayout>
+                    </ViewCell>
+                </TableSection>
+
             </TableRoot>
         </TableView>
     </ContentPage.Content>

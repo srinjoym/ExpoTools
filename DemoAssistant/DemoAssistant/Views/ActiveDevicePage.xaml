@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:s="clr-namespace:DemoAssistant.Services"
              mc:Ignorable="d"
              x:Class="DemoAssistant.Views.ActiveDevicePage"
              Title="{Binding Id}"
@@ -96,7 +97,7 @@
             
 
             <Frame x:Name="AppLaunchFrame" BorderColor="Black" BackgroundColor="White"
-                   Padding="5,10,5,10">
+                   Padding="5,10,5,10" Margin="0,5,0,0">
                 <Grid>
                     <Grid.Resources>
                         <ResourceDictionary>
@@ -144,16 +145,24 @@
                 <Label x:Name="OperationIndicator" Grid.Column="1" Text="🔁"  VerticalOptions="Center" HorizontalOptions="Center" FontSize="Title"/>
             </Grid>
 
-            <FlexLayout Wrap="Wrap" JustifyContent="SpaceAround" Margin="0,30,0,0">
-                <Button Text="Screen Shot" Clicked="ScreenShotClick"/>
-                <Button Text="Next" />
-                <Button Text="Reboot" />
-                <Button Text="Stop All Apps" />
-                <Button Text="Restart Device" />
-                <!--<Button Text="Right Arrow" />-->
-
+            <FlexLayout x:Name="OptionalButtonsLayout" Wrap="Wrap" JustifyContent="SpaceAround" Margin="0,30,0,0">
+                <!-- For optional buttons to behave properly, add an entry to the constructor of the OptionalButtons class -->
+                <Button x:Name="ScreenShotButton"    Text="Screen Shot" Clicked="ScreenShotClick"/>
+                <Button x:Name="LeftArrowButton"     Text="&#x2190;" Command="{Binding SendVirtualKey}" CommandParameter="left"/>
+                <Button x:Name="UpArrowButton"       Text="&#x2191;" Command="{Binding SendVirtualKey}" CommandParameter="up"/>
+                <Button x:Name="DownArrowButton"     Text="&#x2193;" Command="{Binding SendVirtualKey}" CommandParameter="down"/>
+                <Button x:Name="RightArrowButton"    Text="&#x2192;" Command="{Binding SendVirtualKey}" CommandParameter="right"/>
+                <Button x:Name="TabKeyButton"        Text="Tab" Command="{Binding SendVirtualKey}" CommandParameter="tab"/>
+                <Button x:Name="CKeyButton"          Text="C" Command="{Binding SendText}" CommandParameter="C"/>
+                <Button x:Name="DKeyButton"          Text="D" Command="{Binding SendText}" CommandParameter="D"/>
+                <Button x:Name="GKeyButton"          Text="G" Command="{Binding SendText}" CommandParameter="G"/>
+                <Button x:Name="NKeyButton"          Text="N" Command="{Binding SendText}" CommandParameter="N"/>
+                <Button x:Name="PKeyButton"          Text="P" Command="{Binding SendText}" CommandParameter="P"/>
+                <Button x:Name="RKeyButton"          Text="R" Command="{Binding SendText}" CommandParameter="R"/>
+                <Button x:Name="StopAppAppsButton"   Text="Stop All Apps" Clicked="StopAllAppsClick"/>
+                <Button x:Name="RestartDeviceButton" Text="Restart Device" Clicked="RestartDeviceClick"/>
+                <Button x:Name="DevicePortalButton"  Text="Device Portal" Clicked="DevicePortalClick"/>
             </FlexLayout>
-
 
         </StackLayout>
     </ContentPage.Content>

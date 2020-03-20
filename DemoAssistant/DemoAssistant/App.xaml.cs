@@ -19,6 +19,7 @@ namespace DemoAssistant
             DependencyService.Register<DeviceList>();
             DependencyService.Register<ActiveDeviceList>();
             DependencyService.Register<LoggingService>();
+            DependencyService.Register<OptionalButtons>();
 
             MainPage = new MainPage();
 

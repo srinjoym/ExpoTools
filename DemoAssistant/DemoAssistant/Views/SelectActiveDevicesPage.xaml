@@ -6,7 +6,7 @@
              mc:Ignorable="d"
              x:Class="DemoAssistant.Views.SelectActiveDevicesPage">
 
-    <ListView x:Name="MyListView"
+    <ListView
             ItemsSource="{Binding Path=CheckListItems}"
             SelectionMode="None"
             CachingStrategy="RecycleElement">

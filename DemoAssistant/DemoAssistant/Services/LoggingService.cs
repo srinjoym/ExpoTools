@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace DemoAssistant.Services
@@ -134,7 +135,17 @@ namespace DemoAssistant.Services
 
         private void OnLogChanged()
         {
-            this.LogChanged?.Invoke(this, null);
+            // Do all events back on the main thread.  We could try
+            // to be a little more full-service here by calling back
+            // on the thread where the event handler was registered
+            // (if the thread is still around :-)
+            if (this.LogChanged != null)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    this.LogChanged?.Invoke(this, null);
+                });
+            }
         }
     }
 }

@@ -18,11 +18,63 @@ namespace DemoAssistant.Views
     {
         private ActiveDevice activeDevice = null;
 
+        private Dictionary<string, int> vkeyNames = new Dictionary<string, int>();
+
+        public Command SendText { get; private set; }
+
+        public Command SendVirtualKey { get; private set; }
+
         public ActiveDevicePage()
         {
+            this.vkeyNames["left"] = 0x25;
+            this.vkeyNames["up"] = 0x26;
+            this.vkeyNames["down"] = 0x28;
+            this.vkeyNames["right"] = 0x27;
+            this.vkeyNames["tab"] = 0x09;
+
+            this.SendText = new Command(async (param) =>
+            {
+                var text = param as string;
+                if (!string.IsNullOrEmpty(text))
+                {
+                    await this.activeDevice.SendText(text);
+                }
+            });
+
+            this.SendVirtualKey = new Command(async (param) =>
+            {
+                var vkeyName = param as string;
+                if (!string.IsNullOrEmpty(vkeyName))
+                {
+                    await this.SendVkeyByName(vkeyName);
+                }
+            });
+
             InitializeComponent();
+
             VisualStateManager.GoToState(this.VisualStateContainer, "Inactive");
             VisualStateManager.GoToState(this.VisualStateContainer, "AppLaunchHidden");
+
+            this.OnSettingsSaved();
+        }
+
+        protected override void OnParentSet()
+        {
+            if(this.Parent != null)
+            {
+                MessagingCenter.Subscribe<SettingsPage>(this, SettingsPage.SettingsSavedMessageName, (p) => this.OnSettingsSaved());
+            }
+            else
+            {
+                MessagingCenter.Unsubscribe<SettingsPage>(this, SettingsPage.SettingsSavedMessageName);
+            }
+
+            base.OnParentSet();
+        }
+
+        private void OnSettingsSaved()
+        {
+            DependencyService.Get<OptionalButtons>().ApplyTo(this.OptionalButtonsLayout);
         }
 
         private void ActiveDevicePageBindingContextChanged(object sender, EventArgs e)
@@ -150,6 +202,21 @@ namespace DemoAssistant.Views
             }
         }
 
+        private async void RestartDeviceClick(object sender, EventArgs args)
+        {
+            await this.activeDevice.RebootAsync();
+        }
+
+        private async void StopAllAppsClick(object sender, EventArgs e)
+        {
+            await this.StopAllAppsImpl();
+        }
+
+        private async void DevicePortalClick(object sender, EventArgs e)
+        {
+            await this.activeDevice.LaunchDevicePortalAsync();
+        }
+
         private async Task LaunchApp(AppPackageSetting app)
         {
             string appId;
@@ -180,27 +247,26 @@ namespace DemoAssistant.Views
                     await this.activeDevice.TerminateApplicationAsync(packageName, AppSettings.ForceTerminateExperience);
                 }
 
-                // This code below doesn't do anything - the training app currently lives in the shell space so
-                // we need to kill it by it's executable name
-                // Leaving it around in case the Training app ever becomes a real app
-                //AppSettings.GetAppPackageInfo(AppPackageSetting.TrainingApp, out appId, out packageName);
-                //if (!(string.IsNullOrEmpty(appId) || string.IsNullOrEmpty(packageName)))
-                //{
-                //    await this.activeDevice.TerminateApplicationAsync(packageName, true);
-                //}
-
-                // Kill the training app by it's executable name.  There is no way currently for the
-                // user to set that (we may be able to hack something)
-                if (this.activeDevice.RunningProcesses.Processes != null)
+                // This may not work if the training app is running from the shell.  The actual
+                // app that started the training is long gone
+                AppSettings.GetAppPackageInfo(AppPackageSetting.TrainingApp, out appId, out packageName);
+                if (!(string.IsNullOrEmpty(appId) || string.IsNullOrEmpty(packageName)))
                 {
-                    foreach (var process in this.activeDevice.RunningProcesses.Processes)
-                    {
-                        if (process.Name == AppSettings.TrainingAppExecutableName)
-                        {
-                            await this.activeDevice.TerminateProcessAsync(process.ProcessId);
-                        }
-                    }
+                    await this.activeDevice.TerminateApplicationAsync(packageName, true);
                 }
+
+                //// Kill the training app by it's executable name.  There is no way currently for the
+                //// user to set that (we may be able to hack something)
+                //if (this.activeDevice.RunningProcesses.Processes != null)
+                //{
+                //    foreach (var process in this.activeDevice.RunningProcesses.Processes)
+                //    {
+                //        if (process.Name == AppSettings.TrainingAppExecutableName)
+                //        {
+                //            await this.activeDevice.TerminateProcessAsync(process.ProcessId);
+                //        }
+                //    }
+                //}
 
                 // Kill the kiosk mode app nicely - dont' force it
                 if (!string.IsNullOrEmpty(this.activeDevice.KioskModePackageName))
@@ -209,5 +275,16 @@ namespace DemoAssistant.Views
                 }
             }
         }
+
+        private async Task SendVkeyByName(string name)
+        {
+            int code;
+            if (this.vkeyNames.TryGetValue(name, out code))
+            {
+                await this.activeDevice.SendVkey(true, code);
+                await this.activeDevice.SendVkey(false, code);
+            }
+        }
+
     }
 }
