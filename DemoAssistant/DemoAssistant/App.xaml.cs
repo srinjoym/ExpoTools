@@ -6,6 +6,7 @@ using DemoAssistant.Views;
 using ExpoHelpers;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace DemoAssistant
 {
@@ -16,29 +17,64 @@ namespace DemoAssistant
         {
             InitializeComponent();
 
+            // Register all the singletons that are
+            // not specific to a platform
             DependencyService.Register<DeviceList>();
             DependencyService.Register<ActiveDeviceList>();
             DependencyService.Register<LoggingService>();
             DependencyService.Register<OptionalButtons>();
 
-            MainPage = new MainPage();
+            // Wire-up all the notifications that go between the singletons.
+            var deviceList = DependencyService.Get<DeviceList>();
+            var activeDeviceList = DependencyService.Get<ActiveDeviceList>();
+            var loggingService = DependencyService.Get<ILoggingService>();
 
-            DependencyService.Get<ActiveDeviceList>().Log += DependencyService.Get<ILoggingService>().LogDeviceMessage;
+            deviceList.PropertyChanged += async (o,args) =>
+            {
+                if(args.PropertyName == nameof(deviceList.DeviceInfos))
+                {
+                    await this.UpdateActiveDevicesAsync();
+                }
+            };
+
+            deviceList.Log += loggingService.LogMessage;
+            activeDeviceList.Log += loggingService.LogDeviceMessage;
             
             Task.Run(this.InitAsync);
+
+            this.MainPage = new MainPage();
         }
 
         private async Task InitAsync()
         {
             var deviceList = DependencyService.Get<DeviceList>();
-            var activeDeviceList = DependencyService.Get<ActiveDeviceList>();
 
             var testDevicesStream = await DependencyService.Get<IDeviceListStorage>().GetDeviceListStreamAsync();
             deviceList.LoadDeviceList(testDevicesStream);
 
+            await this.UpdateActiveDevicesAsync();
+        }
+
+        /// <summary>
+        /// Updates the ActiveDevices instance with devices from the
+        /// DeviceList instance filtered by what devices the user has selected
+        /// </summary>
+        /// <returns></returns>
+        private async Task UpdateActiveDevicesAsync()
+        {
+            var deviceList = DependencyService.Get<DeviceList>();
+            var activeDeviceList = DependencyService.Get<ActiveDeviceList>();
+
             var deviceCheckList = new DeviceCheckList();
-            deviceCheckList.Reset(deviceList.Devices);
+            deviceCheckList.Reset(deviceList.DeviceInfos);
             deviceCheckList.UpdateFromString(AppSettings.SelectedDevices);
+
+            // Temp code to always have one device available so the menu is there
+            // seems like a Xamarin Forms bug
+            if (deviceCheckList.Items.Count > 0 && deviceCheckList.GetCheckedDeviceCount() == 0)
+            {
+                deviceCheckList.Items[0].IsChecked = true;
+            }
 
             await activeDeviceList.UpdateActiveDevicesAsync(false, deviceCheckList.GetCheckedDevices());
         }

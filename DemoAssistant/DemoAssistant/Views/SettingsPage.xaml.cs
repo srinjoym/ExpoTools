@@ -115,7 +115,7 @@ namespace DemoAssistant.Views
 
             this.deviceCheckList = new DeviceCheckList();
             this.deviceCheckList.CheckChanged += OnCheckChanged;
-            this.deviceCheckList.Reset(deviceList.Devices);
+            this.deviceCheckList.Reset(deviceList.DeviceInfos);
             this.deviceCheckList.UpdateFromString(AppSettings.SelectedDevices);
             this.UpdateActiveDevicesText();
 
@@ -140,14 +140,14 @@ namespace DemoAssistant.Views
 
         private async void SelectActiveDevicesClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new SelectActiveDevicesPage(this.deviceCheckList.Items));
+            await Navigation.PushModalAsync(new NavigationPage(new SelectActiveDevicesPage(this.deviceCheckList.Items)));
         }
 
         private async void SelectOptionalButtonsClicked(object sender, EventArgs e)
         {
             var page = new SelectOptionalButtonsPage(this.optionalButtonsList);
             page.Disappearing += this.SelectOptionalButtonsPageDisappearing;
-            await Navigation.PushAsync(page);
+            await Navigation.PushModalAsync(new NavigationPage(page));
         }
 
         private void SelectOptionalButtonsPageDisappearing(object sender, EventArgs args)

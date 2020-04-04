@@ -10,7 +10,7 @@ using Xamarin.Forms.Internals;
 
 namespace DemoAssistant.Services
 {
-    public class OptionalButtonInfo : INotifyPropertyChanged
+    public class OptionalButtonInfo : NotifyPropertyChangedBase
     {
         private bool isChecked = false;
         public bool IsChecked
@@ -26,21 +26,6 @@ namespace DemoAssistant.Services
         {
             this.XamlName = xamlName;
             this.Description = description;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private bool PropertyChangedHelper<T>(ref T storage, T newValue, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-        {
-            if (IEquatable<T>.Equals(newValue, storage))
-            {
-                return false;
-            }
-            storage = newValue;
-
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-            return true;
         }
 
         public override string ToString()

@@ -26,6 +26,11 @@ namespace DemoAssistant.Views
             await Navigation.PushModalAsync(new NavigationPage(new SettingsPage()));
         }
 
+        public async void AddRemoveDevicesClicked(object sender, EventArgs args)
+        {
+            await Navigation.PushModalAsync(new NavigationPage(new ManageDevicesPage()));
+        }
+
         public async void LogClicked(object sender, EventArgs args)
         {
             await Navigation.PushModalAsync(new NavigationPage(new LogView()));

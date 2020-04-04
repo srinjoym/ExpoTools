@@ -23,6 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpoHelpers", "ExpoHelpers\
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\WindowsDevicePortalWrapper\WindowsDevicePortalWrapper\WindowsDevicePortalWrapper.Shared\WindowsDevicePortalWrapper.Shared.projitems*{93144b02-7122-410e-abf9-6bac0d519785}*SharedItemsImports = 5
 		..\WindowsDevicePortalWrapper\WindowsDevicePortalWrapper\WindowsDevicePortalWrapper.Shared\WindowsDevicePortalWrapper.Shared.projitems*{af72a46d-5d30-4fb4-8d3e-b516ed19f9a4}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -14,7 +14,7 @@ namespace ExpoHelpers
     /// <summary>
     /// Manages all the active devices.  Polls them to keep status up to date.
     /// </summary>
-    public class ActiveDeviceList : INotifyPropertyChanged
+    public class ActiveDeviceList : NotifyPropertyChangedBase
     {
         private ObservableCollection<ActiveDevice> activeDevices = new ObservableCollection<ActiveDevice>();
         public ReadOnlyObservableCollection<ActiveDevice> ActiveDevices { get; private set; }
@@ -36,8 +36,10 @@ namespace ExpoHelpers
             this.ActiveDevices = new ReadOnlyObservableCollection<ActiveDevice>(this.activeDevices);
         }
 
-        public async Task UpdateActiveDevicesAsync(bool forceReset, DeviceInformation[] newDevices)
+        public async Task UpdateActiveDevicesAsync(bool forceReset, IList<DeviceInformation> newDevices)
         {
+            // TODO - we should preserve the order of devices from DeviceList
+
             // Remove any devices that are not in the newDevices list
             for (int i = this.activeDevices.Count - 1; i >= 0; i--)
             {
@@ -200,25 +202,6 @@ namespace ExpoHelpers
         private void LogMessage(bool isError, string message)
         {
             this.Log?.Invoke(isError, null, $"ActiveDeviceList: {message}");
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private bool PropertyChangedHelper<T>(ref T storage, T newValue, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-        {
-            if (IEquatable<T>.Equals(newValue, storage))
-            {
-                return false;
-            }
-            storage = newValue;
-
-            this.SendPropertyChanged(propertyName);
-
-            return true;
-        }
-
-        private void SendPropertyChanged(string propertyName)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

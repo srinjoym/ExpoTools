@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="DemoAssistant.Views.DeviceInformationEditor">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Cancel" Clicked="CancelClicked" />
+        <ToolbarItem Text="Save" Clicked="SaveClicked" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <TableView Intent="Settings" HasUnevenRows="True">
+            <TableRoot>
+                <TableSection Title="Device">
+                    <EntryCell Label="Network Address" Text="{Binding Path=Address,Mode=TwoWay}"/>
+                    <EntryCell Label="Long Name" Text="{Binding Path=Name,Mode=TwoWay}"/>
+                    <EntryCell Label="Short Name" Text="{Binding Path=Id,Mode=TwoWay}"/>
+                </TableSection>
+                <TableSection Title="Credentials">
+                    <ViewCell>
+                        <Entry Placeholder="User Id (optional)" Text="{Binding UserName}" />
+                    </ViewCell>
+                    <ViewCell>
+                        <Entry Placeholder="Password (optional)" Text="{Binding Password}" IsPassword="True" />
+                    </ViewCell>
+                </TableSection>
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

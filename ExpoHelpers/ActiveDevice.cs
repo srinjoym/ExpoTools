@@ -44,7 +44,7 @@ namespace ExpoHelpers
 
 
 
-    public class ActiveDevice : INotifyPropertyChanged
+    public class ActiveDevice : NotifyPropertyChangedBase
     {
         private DateTime lastHearbeatTime;
         private TimeSpan disconnectTimeout = TimeSpan.FromSeconds(10);
@@ -631,21 +631,6 @@ namespace ExpoHelpers
                     this.LogMessage(true, $"RebootAsync failed {e.Message}");
                 }
             }
-        }
-
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private bool PropertyChangedHelper<T>(ref T storage, T newValue, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-        {
-            if (IEquatable<T>.Equals(newValue, storage))
-            {
-                return false;
-            }
-            storage = newValue;
-
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-            return true;
         }
 
         private string FixupMachineAddress(string address, bool isWindowsDesktop)

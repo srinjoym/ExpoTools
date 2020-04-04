@@ -6,23 +6,7 @@
              xmlns:expoHelpers="clr-namespace:ExpoHelpers;assembly=ExpoHelpers"
              mc:Ignorable="d"
              x:Class="DemoAssistant.Views.SettingsPage">
-
-    <ContentPage.Resources>
-        
-        <DataTemplate x:Key="DeviceChecklistItemTemplate">
-            <ViewCell>
-                <ViewCell.View>
-                    <StackLayout Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Path=IsChecked,Mode=TwoWay}" />
-                        <Label Text="{Binding Path=DisplayName}"/>
-                    </StackLayout>
-                </ViewCell.View>
-            </ViewCell>
-        </DataTemplate>
-
-    </ContentPage.Resources>
-
-    
+   
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Cancel" Clicked="CancelClicked" />
         <ToolbarItem Text="Save" Clicked="SaveClicked" />

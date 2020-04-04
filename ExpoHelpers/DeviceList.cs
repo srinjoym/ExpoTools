@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,83 +9,64 @@ using System.Xml.Serialization;
 
 namespace ExpoHelpers
 {
-    public enum DeviceListStatus
-    {
-        ListLoaded,
-        UnableToReadDeviceListFile,
-    }
-
-    public class DeviceListStatusArgs : EventArgs
-    {
-        public DeviceListStatusArgs(DeviceListStatus status, string message)
-        {
-            this.DeviceListStatus = status;
-            this.Message = message;
-        }
-
-        public DeviceListStatus DeviceListStatus { get; private set; }
-        public string Message { get; private set; }
-    }
-
-    public delegate void DeviceListStatusDelegate(DeviceList sender, DeviceListStatusArgs args);
-
-
     /// <summary>
     /// Class to maintain a list of all the devices we will ever deal with.
     /// </summary>
-    public class DeviceList
+    public class DeviceList : NotifyPropertyChangedBase
     {
-        public event DeviceListStatusDelegate StatusUpdate;
+        public delegate void LogEHandler(bool isError, string message);
 
-        public IList<DeviceInformation> Devices { get; private set; }
+        public event LogEHandler Log;
 
+        private IList<DeviceInformation> deviceInfos;
+        public IList<DeviceInformation> DeviceInfos { get { return this.deviceInfos; } private set { this.PropertyChangedHelper(ref deviceInfos, value); } }
 
         public void LoadDeviceList(Stream deviceListStream)
         {
-            List<ConnectionInformation> connections = null;
+            List<ConnectionInformation> connectionInfos = null;
 
             if(deviceListStream != null)
             {
                 try
                 {
                     XmlSerializer serializer = new XmlSerializer(typeof(List<ConnectionInformation>));
-                    connections = serializer.Deserialize(deviceListStream) as List<ConnectionInformation>;
+                    connectionInfos = serializer.Deserialize(deviceListStream) as List<ConnectionInformation>;
                 }
                 catch(InvalidOperationException e)
                 {
-                    OnStatusUpdate(DeviceListStatus.UnableToReadDeviceListFile, "Unable to read device list file\r\n" + e.InnerException.Message);
-                    connections = null;
+                    this.Log?.Invoke(true, "Unable to read device list file\r\n" + e.InnerException.Message);
+                    connectionInfos = null;
                 }
 
                 // Do some valididty checks on the list.  Make sure all addresses are unique and that none contain a |
                 HashSet<string> allAddresses = new HashSet<string>();
-                foreach (var connection in connections)
+                foreach (var connection in connectionInfos)
                 {
                     if (connection.Address.Contains('|'))
                     {
-                        OnStatusUpdate(DeviceListStatus.UnableToReadDeviceListFile, $"Invalid data in device list file.  Device {connection.Address} contains reserved character |");
-                        connections = null;
+                        this.Log?.Invoke(true, $"Invalid data in device list file.  Device {connection.Address} contains reserved character |");
+                        connectionInfos = null;
                         break;
                     }
 
                     var normalizedAddress = connection.Address.ToLowerInvariant();
                     if (allAddresses.Contains(normalizedAddress))
                     {
-                        OnStatusUpdate(DeviceListStatus.UnableToReadDeviceListFile, $"DeviceList.LoadDeviceList - duplicate address {connection.Address}");
-                        connections = null;
+                        this.Log?.Invoke(true, $"DeviceList.LoadDeviceList - duplicate address {connection.Address}");
+                        connectionInfos = null;
                         break;
                     }
                     allAddresses.Add(normalizedAddress);
                 }
             }
 
-            if (connections == null)
+            if (connectionInfos == null)
             {
-                connections = new List<ConnectionInformation>();
+                connectionInfos = new List<ConnectionInformation>();
             }
 
-            var newDeviceList = new List<DeviceInformation>(connections.Count);
-            foreach(var connection in connections)
+            var newDeviceList = new List<DeviceInformation>(connectionInfos.Count);
+            foreach(var connection in connectionInfos)
             {
                 newDeviceList.Add(new DeviceInformation()
                 {
@@ -95,25 +78,53 @@ namespace ExpoHelpers
                 });
             }
 
-            this.Devices = newDeviceList;
-            OnStatusUpdate(DeviceListStatus.ListLoaded);
-        }
+            this.DeviceInfos = newDeviceList;
 
-        private void OnStatusUpdate(DeviceListStatus status, string message = null)
-        {
-            this.StatusUpdate?.Invoke(this, new DeviceListStatusArgs(status, message ?? string.Empty));
+            this.Log?.Invoke(false, "Successfully loaded device list");
         }
 
         public DeviceInformation TryFind(string address)
         {
-            foreach(var device in this.Devices)
+            foreach(var info in this.DeviceInfos)
             {
-                if(device.Address == address)
+                if(info.Address == address)
                 {
-                    return device;
+                    return info;
                 }
             }
             return null;
         }
+
+        public void ReplaceDeviceList(IList<DeviceInformation> devices)
+        {
+            // Do a deep copy to our list.  Callers will have their
+            // own deep copy.
+            var newDeviceInfos = new List<DeviceInformation>(devices.Count);
+            foreach(var info in devices)
+            {
+                var newDeviceInfo = new DeviceInformation();
+                newDeviceInfo.UpdateFrom(info);
+                newDeviceInfos.Add(info);
+            }
+            this.DeviceInfos = newDeviceInfos;
+        }
+
+        /// <summary>
+        /// Helper for UI that wants to display and edit a copy of the DeviceList.
+        /// Makes a deep copy so changes in the UI don't change the main DeviceList
+        /// </summary>
+        /// <returns></returns>
+        public ObservableCollection<DeviceInformation> CloneDeviceList()
+        {
+            var retval = new ObservableCollection<DeviceInformation>();
+            foreach(var info in this.DeviceInfos)
+            {
+                var newInfo = new DeviceInformation();
+                newInfo.UpdateFrom(info);
+                retval.Add(newInfo);
+            }
+            return retval;
+        }
+
     }
 }

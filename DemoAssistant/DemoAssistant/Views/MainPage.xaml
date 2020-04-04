@@ -8,16 +8,17 @@
             x:Class="DemoAssistant.Views.MainPage"
             >
 
+    <TabbedPage.ToolbarItems>
+        <ToolbarItem Text="Settings &#x2699;" Clicked="SettingsClicked" Order="Secondary" />
+        <ToolbarItem Text="Add/Remove Devices &#x1f517;" Clicked="AddRemoveDevicesClicked" Order="Secondary" />
+        <ToolbarItem Text="Log 🌲" Clicked="LogClicked" Order="Secondary" />
+    </TabbedPage.ToolbarItems>
+
     <TabbedPage.ItemTemplate>
         <DataTemplate>
             <NavigationPage Title="{Binding Path=Id}">
                 <x:Arguments>
-                    <views:ActiveDevicePage>
-                        <views:ActiveDevicePage.ToolbarItems>
-                             <ToolbarItem Text="&#x2699; Settings" Clicked="SettingsClicked" Order="Secondary" />
-                            <ToolbarItem Text="🌲 Log" Clicked="LogClicked" Order="Secondary" />
-                        </views:ActiveDevicePage.ToolbarItems>
-                    </views:ActiveDevicePage>
+                    <views:ActiveDevicePage/>
                 </x:Arguments>
             </NavigationPage>
         </DataTemplate>

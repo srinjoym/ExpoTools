@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="DemoAssistant.Views.ManageDevicesPage"
+             x:Name="ThisPage"
+             >
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Cancel" Clicked="CancelClicked" />
+        <ToolbarItem Text="Save" Clicked="SaveClicked" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Button Grid.Row="0" Grid.Column="0" Text="Add" Clicked="AddClicked"/>
+            <Button Grid.Row="0" Grid.Column="1" Text="Delete" Clicked="DeleteClicked"/>
+            <Button Grid.Row="0" Grid.Column="2" Text="Edit" Clicked="EditClicked"/>
+            <Button Grid.Row="0" Grid.Column="3" Text="Scan QR" Clicked="ScanQrClicked"/>
+            
+            <ListView x:Name="DeviceListView" Grid.Row="1" Grid.ColumnSpan="4" ItemsSource="{Binding DeviceList}" SelectionMode="Single">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Text="{Binding Name}" Style="{DynamicResource ListItemDetailTextStyle}"/>
+                                <Button Grid.Column="1" Text="&#x2191;" Command="{Binding Source={x:Reference ThisPage},Path=MoveUpCommand}" CommandParameter="{Binding .}" WidthRequest="40"/>
+                                <Button Grid.Column="2" Text="&#x2193;" Command="{Binding Source={x:Reference ThisPage},Path=MoveDownCommand}" CommandParameter="{Binding .}" WidthRequest="40"/>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
