@@ -18,55 +18,79 @@ namespace ExpoHelpers
 
         public event LogEHandler Log;
 
-        private IList<DeviceInformation> deviceInfos;
+        private IList<DeviceInformation> deviceInfos = new List<DeviceInformation>();
         public IList<DeviceInformation> DeviceInfos { get { return this.deviceInfos; } private set { this.PropertyChangedHelper(ref deviceInfos, value); } }
 
-        public void LoadDeviceList(Stream deviceListStream)
+        public void LoadDeviceListFromString(string deviceListXml)
+        {
+            if (string.IsNullOrEmpty(deviceListXml))
+            {
+                this.Log?.Invoke(true, "Empty device list string");
+                return;
+            }
+
+            List<ConnectionInformation> connectionInfos = null;
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<ConnectionInformation>));
+                connectionInfos = serializer.Deserialize(new StringReader(deviceListXml)) as List<ConnectionInformation>;
+            }
+            catch(InvalidOperationException e)
+            {
+                this.Log?.Invoke(true, "Unable to read device list string\r\n" + e.InnerException.Message);
+                return;
+            }
+
+            this.TrySetDeviceList(connectionInfos);
+        }
+
+        public void LoadDeviceListFromStream(Stream deviceListStream)
         {
             List<ConnectionInformation> connectionInfos = null;
 
-            if(deviceListStream != null)
+            if(deviceListStream == null)
             {
-                try
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<ConnectionInformation>));
-                    connectionInfos = serializer.Deserialize(deviceListStream) as List<ConnectionInformation>;
-                }
-                catch(InvalidOperationException e)
-                {
-                    this.Log?.Invoke(true, "Unable to read device list file\r\n" + e.InnerException.Message);
-                    connectionInfos = null;
-                }
-
-                // Do some valididty checks on the list.  Make sure all addresses are unique and that none contain a |
-                HashSet<string> allAddresses = new HashSet<string>();
-                foreach (var connection in connectionInfos)
-                {
-                    if (connection.Address.Contains('|'))
-                    {
-                        this.Log?.Invoke(true, $"Invalid data in device list file.  Device {connection.Address} contains reserved character |");
-                        connectionInfos = null;
-                        break;
-                    }
-
-                    var normalizedAddress = connection.Address.ToLowerInvariant();
-                    if (allAddresses.Contains(normalizedAddress))
-                    {
-                        this.Log?.Invoke(true, $"DeviceList.LoadDeviceList - duplicate address {connection.Address}");
-                        connectionInfos = null;
-                        break;
-                    }
-                    allAddresses.Add(normalizedAddress);
-                }
+                this.Log?.Invoke(true, "Empty device list stream");
+                return;
             }
 
-            if (connectionInfos == null)
+            try
             {
-                connectionInfos = new List<ConnectionInformation>();
+                XmlSerializer serializer = new XmlSerializer(typeof(List<ConnectionInformation>));
+                connectionInfos = serializer.Deserialize(deviceListStream) as List<ConnectionInformation>;
+            }
+            catch(InvalidOperationException e)
+            {
+                this.Log?.Invoke(true, "Unable to read device list file\r\n" + e.InnerException.Message);
+                return;
+            }
+
+            this.TrySetDeviceList(connectionInfos);
+        }
+
+        private bool TrySetDeviceList(List<ConnectionInformation> connectionInfos)
+        {
+            // Do some valididty checks on the list.  Make sure all addresses are unique and that none contain a |
+            HashSet<string> allAddresses = new HashSet<string>();
+            foreach (var connection in connectionInfos)
+            {
+                if (connection.Address.Contains('|'))
+                {
+                    this.Log?.Invoke(true, $"Invalid data in device list file.  Device {connection.Address} contains reserved character |");
+                    return false;
+                }
+
+                var normalizedAddress = connection.Address.ToLowerInvariant();
+                if (allAddresses.Contains(normalizedAddress))
+                {
+                    this.Log?.Invoke(true, $"DeviceList.LoadDeviceList - duplicate address {connection.Address}");
+                    return false;
+                }
+                allAddresses.Add(normalizedAddress);
             }
 
             var newDeviceList = new List<DeviceInformation>(connectionInfos.Count);
-            foreach(var connection in connectionInfos)
+            foreach (var connection in connectionInfos)
             {
                 newDeviceList.Add(new DeviceInformation()
                 {
@@ -79,8 +103,31 @@ namespace ExpoHelpers
             }
 
             this.DeviceInfos = newDeviceList;
-
             this.Log?.Invoke(false, "Successfully loaded device list");
+            return true;
+        }
+
+        public string GetDeviceListString()
+        {
+            // Create a list of ConnectionInfo classes to serialize out
+            var connectionInfos = new List<ConnectionInformation>(this.deviceInfos.Count);
+            foreach (var deviceInfo in this.DeviceInfos)
+            {
+                var connectionInfo = new ConnectionInformation()
+                {
+                    Address = deviceInfo.Address,
+                    Id = deviceInfo.Id,
+                    Name = deviceInfo.Name,
+                    Password = deviceInfo.Password,
+                    UserName = deviceInfo.UserName,
+                };
+                connectionInfos.Add(connectionInfo);
+            }
+
+            var stringWriter = new StringWriter();
+            XmlSerializer serializer = new XmlSerializer(typeof(List<ConnectionInformation>));
+            serializer.Serialize(stringWriter, connectionInfos);
+            return stringWriter.ToString();
         }
 
         public DeviceInformation TryFind(string address)
@@ -93,20 +140,6 @@ namespace ExpoHelpers
                 }
             }
             return null;
-        }
-
-        public void ReplaceDeviceList(IList<DeviceInformation> devices)
-        {
-            // Do a deep copy to our list.  Callers will have their
-            // own deep copy.
-            var newDeviceInfos = new List<DeviceInformation>(devices.Count);
-            foreach(var info in devices)
-            {
-                var newDeviceInfo = new DeviceInformation();
-                newDeviceInfo.UpdateFrom(info);
-                newDeviceInfos.Add(info);
-            }
-            this.DeviceInfos = newDeviceInfos;
         }
 
         /// <summary>
@@ -125,6 +158,21 @@ namespace ExpoHelpers
             }
             return retval;
         }
+
+        public void ReplaceDeviceList(IList<DeviceInformation> devices)
+        {
+            // Do a deep copy to our list.  Callers will have their
+            // own deep copy.
+            var newDeviceInfos = new List<DeviceInformation>(devices.Count);
+            foreach (var info in devices)
+            {
+                var newDeviceInfo = new DeviceInformation();
+                newDeviceInfo.UpdateFrom(info);
+                newDeviceInfos.Add(info);
+            }
+            this.DeviceInfos = newDeviceInfos;
+        }
+
 
     }
 }

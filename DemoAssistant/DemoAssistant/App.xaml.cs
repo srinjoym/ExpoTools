@@ -49,8 +49,20 @@ namespace DemoAssistant
         {
             var deviceList = DependencyService.Get<DeviceList>();
 
-            var testDevicesStream = await DependencyService.Get<IDeviceListStorage>().GetDeviceListStreamAsync();
-            deviceList.LoadDeviceList(testDevicesStream);
+            var deviceListString = AppSettings.DeviceListString;
+            if(!string.IsNullOrEmpty(deviceListString))
+            {
+                // Try loading the device list from settings
+                deviceList.LoadDeviceListFromString(deviceListString);
+            }
+
+            if(deviceList.DeviceInfos.Count == 0)
+            {
+                // Couldn't load the device list from settings so try the
+                // hard-coded list
+                var testDevicesStream = await DependencyService.Get<IDeviceListStorage>().GetDeviceListStreamAsync();
+                deviceList.LoadDeviceListFromStream(testDevicesStream);
+            }
 
             await this.UpdateActiveDevicesAsync();
         }
@@ -69,8 +81,8 @@ namespace DemoAssistant
             deviceCheckList.Reset(deviceList.DeviceInfos);
             deviceCheckList.UpdateFromString(AppSettings.SelectedDevices);
 
-            // Temp code to always have one device available so the menu is there
-            // seems like a Xamarin Forms bug
+            // Temp code to always have one device available so the menu is there.
+            // Seems like a Xamarin Forms bug
             if (deviceCheckList.Items.Count > 0 && deviceCheckList.GetCheckedDeviceCount() == 0)
             {
                 deviceCheckList.Items[0].IsChecked = true;

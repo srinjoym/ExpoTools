@@ -18,31 +18,31 @@ namespace DemoAssistant.Views
         public Command MoveDownCommand { get; }
 
 
-        public ObservableCollection<DeviceInformation> DeviceList { get; private set; }
+        public ObservableCollection<DeviceInformation> Devices { get; private set; }
 
         public ManageDevicesPage()
         {
             // Work on a deep copy of the deviceList so cancel will undo all changes to
             // the list and the devices it contains
-            this.DeviceList = DependencyService.Get<DeviceList>().CloneDeviceList();
+            this.Devices = DependencyService.Get<DeviceList>().CloneDeviceList();
 
             this.MoveUpCommand = new Command((param) =>
             {
                 var info = (DeviceInformation)param;
-                int index = this.DeviceList.IndexOf(info);
+                int index = this.Devices.IndexOf(info);
                 if (index > 0)
                 {
-                    this.DeviceList.Move(index, index - 1);
+                    this.Devices.Move(index, index - 1);
                 }
             });
 
             this.MoveDownCommand = new Command((param) =>
             {
                 var info = (DeviceInformation)param;
-                int index = this.DeviceList.IndexOf(info);
-                if (index >= 0 && index < this.DeviceList.Count - 2)
+                int index = this.Devices.IndexOf(info);
+                if (index >= 0 && index < this.Devices.Count - 2)
                 {
-                    this.DeviceList.Move(index, index + 1);
+                    this.Devices.Move(index, index + 1);
                 }
             });
 
@@ -63,11 +63,9 @@ namespace DemoAssistant.Views
 
         public async void SaveClicked(object sender, EventArgs args)
         {
-            // Update DeviceList
-            DependencyService.Get<DeviceList>().ReplaceDeviceList(this.DeviceList);
-
-            // TODO: Persist changes to storage
-
+            var deviceList = DependencyService.Get<DeviceList>();
+            deviceList.ReplaceDeviceList(this.Devices);
+            AppSettings.DeviceListString = deviceList.GetDeviceListString();
             await Navigation.PopModalAsync();
         }
 
@@ -76,7 +74,7 @@ namespace DemoAssistant.Views
             // Code we run if the user clicks save in the DeviceInformationEditor
             Action<DeviceInformation> onSave = (info) =>
             {
-                this.DeviceList.Add(info);
+                this.Devices.Add(info);
                 this.DeviceListView.ScrollTo(info, ScrollToPosition.MakeVisible, true);
             };
 
@@ -108,7 +106,7 @@ namespace DemoAssistant.Views
             var selectedItem = this.DeviceListView.SelectedItem as DeviceInformation;
             if(selectedItem != null)
             {
-                this.DeviceList.Remove(selectedItem);
+                this.Devices.Remove(selectedItem);
             }
         }
 

@@ -30,7 +30,7 @@
             <Button Grid.Row="0" Grid.Column="2" Text="Edit" Clicked="EditClicked"/>
             <Button Grid.Row="0" Grid.Column="3" Text="Scan QR" Clicked="ScanQrClicked"/>
             
-            <ListView x:Name="DeviceListView" Grid.Row="1" Grid.ColumnSpan="4" ItemsSource="{Binding DeviceList}" SelectionMode="Single">
+            <ListView x:Name="DeviceListView" Grid.Row="1" Grid.ColumnSpan="4" ItemsSource="{Binding Devices}" SelectionMode="Single">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>

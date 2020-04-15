@@ -21,6 +21,16 @@ namespace ExpoHelpers
         private static string AppIdKey(AppPackageSetting app) { return appPackage + app.ToString() + "AppId"; }
 
 
+        private static string deviceListString = string.Empty;
+        /// <summary>
+        /// XML string with the full list of devices
+        /// </summary>
+        public static string DeviceListString
+        {
+            get { GetLocalSetting(out deviceListString, string.Empty); return deviceListString; }
+            set { SetLocalSetting(ref deviceListString, value); }
+        }
+
         private static string selectedDevices = string.Empty;
         public static string SelectedDevices
         {
