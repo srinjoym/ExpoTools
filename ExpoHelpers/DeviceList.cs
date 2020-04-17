@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -14,6 +15,8 @@ namespace ExpoHelpers
     /// </summary>
     public class DeviceList : NotifyPropertyChangedBase
     {
+        public const char DevicesSeperator = '|';
+
         public delegate void LogEHandler(bool isError, string message);
 
         public event LogEHandler Log;
@@ -74,9 +77,9 @@ namespace ExpoHelpers
             HashSet<string> allAddresses = new HashSet<string>();
             foreach (var connection in connectionInfos)
             {
-                if (connection.Address.Contains('|'))
+                if (connection.Address.Contains(DevicesSeperator))
                 {
-                    this.Log?.Invoke(true, $"Invalid data in device list file.  Device {connection.Address} contains reserved character |");
+                    this.Log?.Invoke(true, $"Invalid data in device list file.  Device {connection.Address} contains reserved character {DevicesSeperator}");
                     return false;
                 }
 
@@ -129,6 +132,71 @@ namespace ExpoHelpers
             serializer.Serialize(stringWriter, connectionInfos);
             return stringWriter.ToString();
         }
+
+        public string GetCheckedDevicesString()
+        {
+            var sb = new StringBuilder();
+            foreach (var item in this.DeviceInfos)
+            {
+                if (item.IsChecked)
+                {
+                    sb.Append(item.Address);
+                    sb.Append(DevicesSeperator);
+                }
+            }
+
+            if (sb.Length > 0)
+            {
+                // remove the extra seperator
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            return sb.ToString();
+        }
+
+        public void UpdateCheckedDevices(string settingsString)
+        {
+            if (!string.IsNullOrEmpty(settingsString))
+            {
+                var addresses = settingsString.Split(DevicesSeperator);
+                foreach (var item in this.DeviceInfos)
+                {
+                    string address = addresses.FirstOrDefault((s) => (item.Address == s));
+                    item.IsChecked = (address != default(string));
+                }
+            }
+        }
+
+        public int GetCheckedDevicesCount()
+        {
+            return this.DeviceInfos.Count((info) => info.IsChecked);
+        }
+
+        public DeviceInformation[] GetCheckedDevices()
+        {
+            var checkedDevices = new List<DeviceInformation>();
+            foreach (var item in this.DeviceInfos)
+            {
+                if (item.IsChecked)
+                {
+                    checkedDevices.Add(item);
+                }
+            }
+            return checkedDevices.ToArray();
+        }
+
+        public bool IsDeviceChecked(string address)
+        {
+            foreach (var item in this.DeviceInfos)
+            {
+                if (item.Address == address)
+                {
+                    return item.IsChecked;
+                }
+            }
+            return false;
+        }
+
 
         public DeviceInformation TryFind(string address)
         {

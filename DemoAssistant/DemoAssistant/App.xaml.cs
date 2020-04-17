@@ -64,6 +64,11 @@ namespace DemoAssistant
                 deviceList.LoadDeviceListFromStream(testDevicesStream);
             }
 
+            // Update the selected devices from settings.  We don't just have this
+            // in the DeviceList XML to keep it compatable with other apps that use it.
+            // May not be important...
+            deviceList.UpdateCheckedDevices(AppSettings.SelectedDevices);
+
             await this.UpdateActiveDevicesAsync();
         }
 
@@ -77,18 +82,14 @@ namespace DemoAssistant
             var deviceList = DependencyService.Get<DeviceList>();
             var activeDeviceList = DependencyService.Get<ActiveDeviceList>();
 
-            var deviceCheckList = new DeviceCheckList();
-            deviceCheckList.Reset(deviceList.DeviceInfos);
-            deviceCheckList.UpdateFromString(AppSettings.SelectedDevices);
-
             // Temp code to always have one device available so the menu is there.
             // Seems like a Xamarin Forms bug
-            if (deviceCheckList.Items.Count > 0 && deviceCheckList.GetCheckedDeviceCount() == 0)
+            if (deviceList.GetCheckedDevicesCount() == 0 && deviceList.DeviceInfos.Count > 0)
             {
-                deviceCheckList.Items[0].IsChecked = true;
+                deviceList.DeviceInfos[0].IsChecked = true;
             }
 
-            await activeDeviceList.UpdateActiveDevicesAsync(false, deviceCheckList.GetCheckedDevices());
+            await activeDeviceList.UpdateActiveDevicesAsync(false);
         }
 
         protected override void OnStart()

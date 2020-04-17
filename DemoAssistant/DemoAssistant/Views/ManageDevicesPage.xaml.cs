@@ -17,14 +17,13 @@ namespace DemoAssistant.Views
 
         public Command MoveDownCommand { get; }
 
-
         public ObservableCollection<DeviceInformation> Devices { get; private set; }
 
-        public ManageDevicesPage()
+        public ManageDevicesPage(ObservableCollection<DeviceInformation> devices)
         {
             // Work on a deep copy of the deviceList so cancel will undo all changes to
             // the list and the devices it contains
-            this.Devices = DependencyService.Get<DeviceList>().CloneDeviceList();
+            this.Devices = devices;
 
             this.MoveUpCommand = new Command((param) =>
             {
@@ -51,29 +50,12 @@ namespace DemoAssistant.Views
             InitializeComponent();
         }
 
-        protected override bool OnBackButtonPressed()
-        {
-            return true; // stop back navigation
-        }
-
-        public async void CancelClicked(object sender, EventArgs args)
-        {
-            await Navigation.PopModalAsync();
-        }
-
-        public async void SaveClicked(object sender, EventArgs args)
-        {
-            var deviceList = DependencyService.Get<DeviceList>();
-            deviceList.ReplaceDeviceList(this.Devices);
-            AppSettings.DeviceListString = deviceList.GetDeviceListString();
-            await Navigation.PopModalAsync();
-        }
-
         private async void AddClicked(object sender, EventArgs e)
         {
             // Code we run if the user clicks save in the DeviceInformationEditor
             Action<DeviceInformation> onSave = (info) =>
             {
+                info.IsChecked = true; // assume they want the new device visible
                 this.Devices.Add(info);
                 this.DeviceListView.ScrollTo(info, ScrollToPosition.MakeVisible, true);
             };

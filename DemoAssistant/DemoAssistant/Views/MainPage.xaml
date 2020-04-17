@@ -10,7 +10,6 @@
 
     <TabbedPage.ToolbarItems>
         <ToolbarItem Text="Settings &#x2699;" Clicked="SettingsClicked" Order="Secondary" />
-        <ToolbarItem Text="Add/Remove Devices &#x1f517;" Clicked="AddRemoveDevicesClicked" Order="Secondary" />
         <ToolbarItem Text="Log 🌲" Clicked="LogClicked" Order="Secondary" />
     </TabbedPage.ToolbarItems>
 

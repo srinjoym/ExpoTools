@@ -25,6 +25,9 @@ namespace ExpoHelpers
         private string password;
         public string Password { get { return this.password; } set { this.PropertyChangedHelper(ref this.password, value); } }
 
+        private bool isChecked;
+        public bool IsChecked { get { return this.isChecked; } set { this.PropertyChangedHelper(ref this.isChecked, value); } }
+
 
         public override bool Equals(object obj)
         {
@@ -45,6 +48,7 @@ namespace ExpoHelpers
             this.Id = other.Id;
             this.UserName = other.UserName;
             this.Password = other.Password;
+            this.IsChecked = other.IsChecked;
         }
     }
 }

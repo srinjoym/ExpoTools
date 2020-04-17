@@ -34,11 +34,11 @@
                         <Picker Title="Application" ItemsSource="{Binding InstalledApplications}" ItemDisplayBinding="{Binding DisplayName}" SelectedItem="{Binding Path=ExperienceApplication,Mode=TwoWay}"/>
                     </ViewCell>
                 </TableSection>
-                <TableSection Title="Active Devices">
+                <TableSection Title="Devices">
                     <ViewCell>
                         <StackLayout Margin="5,0,0,0">
                             <Label LineBreakMode="WordWrap" Text="{Binding Path=ActiveDevicesText,Mode=OneWay,FallbackValue='F,1,3,4'}"/>
-                            <Button Text="Select" Clicked="SelectActiveDevicesClicked" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand"/>
+                            <Button Text="Manage Devices" Clicked="ManageDevicesClicked" HorizontalOptions="Fill"  VerticalOptions="CenterAndExpand"/>
                         </StackLayout>
                     </ViewCell>
                 </TableSection>

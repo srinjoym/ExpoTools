@@ -7,10 +7,6 @@
              x:Class="DemoAssistant.Views.ManageDevicesPage"
              x:Name="ThisPage"
              >
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Cancel" Clicked="CancelClicked" />
-        <ToolbarItem Text="Save" Clicked="SaveClicked" />
-    </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
         <Grid>
@@ -36,13 +32,15 @@
                         <ViewCell>
                             <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Column="0" Text="{Binding Name}" Style="{DynamicResource ListItemDetailTextStyle}"/>
-                                <Button Grid.Column="1" Text="&#x2191;" Command="{Binding Source={x:Reference ThisPage},Path=MoveUpCommand}" CommandParameter="{Binding .}" WidthRequest="40"/>
-                                <Button Grid.Column="2" Text="&#x2193;" Command="{Binding Source={x:Reference ThisPage},Path=MoveDownCommand}" CommandParameter="{Binding .}" WidthRequest="40"/>
+                                <CheckBox Grid.Column="0" IsChecked="{Binding Path=IsChecked,Mode=TwoWay}" />
+                                <Label Grid.Column="1" Text="{Binding Name}" Style="{DynamicResource ListItemDetailTextStyle}"/>
+                                <Button Grid.Column="2" Text="&#x2191;" Command="{Binding Source={x:Reference ThisPage},Path=MoveUpCommand}" CommandParameter="{Binding .}" WidthRequest="40"/>
+                                <Button Grid.Column="3" Text="&#x2193;" Command="{Binding Source={x:Reference ThisPage},Path=MoveDownCommand}" CommandParameter="{Binding .}" WidthRequest="40"/>
                             </Grid>
                         </ViewCell>
                     </DataTemplate>

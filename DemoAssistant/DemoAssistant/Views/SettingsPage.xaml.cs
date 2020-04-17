@@ -94,8 +94,7 @@ namespace DemoAssistant.Views
             set { this.SetValue(OptionalButtonsTextProperty, value); }
         }
 
-
-        private DeviceCheckList deviceCheckList;
+        private ObservableCollection<DeviceInformation> allDevices;
         private ObservableCollection<OptionalButtonInfo> optionalButtonsList;
 
         public SettingsPage()
@@ -113,24 +112,20 @@ namespace DemoAssistant.Views
             var deviceList = DependencyService.Get<DeviceList>();
             var activeDeviceList = DependencyService.Get<ActiveDeviceList>();
 
-            this.deviceCheckList = new DeviceCheckList();
-            this.deviceCheckList.CheckChanged += OnCheckChanged;
-            this.deviceCheckList.Reset(deviceList.DeviceInfos);
-            this.deviceCheckList.UpdateFromString(AppSettings.SelectedDevices);
+            // Work on a deep copy of the DeviceList so cancel will undo all changes to
+            // the list and the devices it contains
+            this.allDevices = deviceList.CloneDeviceList();
+
             this.UpdateActiveDevicesText();
 
             this.optionalButtonsList = new ObservableCollection<OptionalButtonInfo>(DependencyService.Get<OptionalButtons>().CloneButtonsList());
             this.UpdateObtionalButtonsText();
 
-            // Sometimes ActiveDeviceList.AllInstalledApplications takea a while to update.
-            // Do a binding here to hopefully reduce confusion.
+            // ActiveDeviceList.AllInstalledApplications updates over time as
+            // devices come and go
+            // so keep the list up to date with a binding.
             // This binding also updates the UI for the currently picked apps
             this.SetBinding(InstalledApplicationsProperty, new Binding("AllInstalledApplications", BindingMode.OneWay, null, null, null, activeDeviceList));
-        }
-
-        private void OnCheckChanged(object sender, EventArgs e)
-        {
-            this.UpdateActiveDevicesText();
         }
 
         protected override bool OnBackButtonPressed()
@@ -138,9 +133,16 @@ namespace DemoAssistant.Views
             return true; // stop back navigation
         }
 
-        private async void SelectActiveDevicesClicked(object sender, EventArgs e)
+        private async void ManageDevicesClicked(object sender, EventArgs e)
         {
-            await Navigation.PushModalAsync(new NavigationPage(new SelectActiveDevicesPage(this.deviceCheckList.Items)));
+            var page = new ManageDevicesPage(this.allDevices);
+            page.Disappearing += ManageDevicesPageDisappearing;
+            await Navigation.PushModalAsync(new NavigationPage(page));
+        }
+
+        private void ManageDevicesPageDisappearing(object sender, EventArgs e)
+        {
+            this.UpdateActiveDevicesText();
         }
 
         private async void SelectOptionalButtonsClicked(object sender, EventArgs e)
@@ -165,9 +167,13 @@ namespace DemoAssistant.Views
             AppSettings.DefaultUserName = this.UserName;
             AppSettings.DefaultPassword = this.Password;
 
-            AppSettings.SelectedDevices = this.deviceCheckList.GetSettingsString();
+            var deviceList = DependencyService.Get<DeviceList>();
+            deviceList.ReplaceDeviceList(this.allDevices);
+            AppSettings.DeviceListString = deviceList.GetDeviceListString();
+
+            AppSettings.SelectedDevices = deviceList.GetCheckedDevicesString();
             var activeDeviceList = DependencyService.Get<ActiveDeviceList>();
-            await activeDeviceList.UpdateActiveDevicesAsync(false, this.deviceCheckList.GetCheckedDevices());
+            await activeDeviceList.UpdateActiveDevicesAsync(false);
 
             if(this.TrainingApplication != null)
             {
@@ -191,11 +197,11 @@ namespace DemoAssistant.Views
         {
             var sb = new StringBuilder();
 
-            foreach(var item in this.deviceCheckList.Items)
+            foreach(var item in this.allDevices)
             {
                 if(item.IsChecked)
                 {
-                    sb.Append(item.DisplayName);
+                    sb.Append(item.Name);
                     sb.Append(',');
                 }
             }

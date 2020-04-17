@@ -36,15 +36,17 @@ namespace ExpoHelpers
             this.ActiveDevices = new ReadOnlyObservableCollection<ActiveDevice>(this.activeDevices);
         }
 
-        public async Task UpdateActiveDevicesAsync(bool forceReset, IList<DeviceInformation> newDevices)
+        public async Task UpdateActiveDevicesAsync(bool forceReset)
         {
+            var deviceList = DependencyService.Get<DeviceList>();
+
             // TODO - we should preserve the order of devices from DeviceList
 
             // Remove any devices that are not in the newDevices list
             for (int i = this.activeDevices.Count - 1; i >= 0; i--)
             {
                 var activeDevice = this.activeDevices[i];
-                if (forceReset || default(DeviceInformation) == newDevices.FirstOrDefault((di) => di.Address == activeDevice.Address))
+                if (forceReset || !deviceList.IsDeviceChecked(activeDevice.Address))
                 {
                     await activeDevice.Close();
                     this.activeDevices.RemoveAt(i);
@@ -52,15 +54,16 @@ namespace ExpoHelpers
             }
 
             // Create any devices that we don't have
-            foreach (var newDeviceInformation in newDevices)
+            foreach (var deviceInformation in deviceList.DeviceInfos)
             {
-                if (!this.HaveActiveDevice(newDeviceInformation.Address))
-                {
-                    var newDevice = new ActiveDevice(newDeviceInformation);
-                    newDevice.GetRunningProcessesOnHeartbeat = true; // maybe just do this with the selected device
-                    newDevice.Log += this.LogDeviceMessage;
-                    this.activeDevices.Add(newDevice);
-                }
+                if (!deviceInformation.IsChecked) continue;
+
+                if (this.HaveActiveDevice(deviceInformation.Address)) continue;
+
+                var newDevice = new ActiveDevice(deviceInformation);
+                newDevice.GetRunningProcessesOnHeartbeat = true; // maybe just do this with the selected device
+                newDevice.Log += this.LogDeviceMessage;
+                this.activeDevices.Add(newDevice);
             }
 
             // Get the heartbeat going if we need to
