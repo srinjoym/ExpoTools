@@ -40,30 +40,45 @@ namespace ExpoHelpers
         {
             var deviceList = DependencyService.Get<DeviceList>();
 
-            // TODO - we should preserve the order of devices from DeviceList
-
-            // Remove any devices that are not in the newDevices list
-            for (int i = this.activeDevices.Count - 1; i >= 0; i--)
+            int nextDeviceIndex = 0;
+            foreach(var deviceInformation in deviceList.DeviceInfos)
             {
-                var activeDevice = this.activeDevices[i];
-                if (forceReset || !deviceList.IsDeviceChecked(activeDevice.Address))
+
+                if(deviceInformation.IsChecked)
                 {
-                    await activeDevice.Close();
-                    this.activeDevices.RemoveAt(i);
+                    int currentDeviceIndex = this.TryGetActiveDeviceIndex(deviceInformation.Address);
+
+                    if(currentDeviceIndex >= 0)
+                    {
+                        // We already have this active device so just put it in the next position
+
+                        // Only move it if it's in the wrong position
+                        if(currentDeviceIndex != nextDeviceIndex)
+                        {
+                            var activeDevice = this.activeDevices[currentDeviceIndex];
+                            this.activeDevices.RemoveAt(currentDeviceIndex);
+                            this.activeDevices.Insert(nextDeviceIndex, activeDevice);
+                        }
+                    }
+                    else
+                    {
+                        // We don't have an active device for this item so create and add
+                        var activeDevice = new ActiveDevice(deviceInformation);
+                        activeDevice.GetRunningProcessesOnHeartbeat = true; // maybe just do this with the selected device
+                        activeDevice.Log += this.LogDeviceMessage;
+                        this.activeDevices.Insert(nextDeviceIndex, activeDevice);
+                    }
+
+                    ++nextDeviceIndex;
                 }
             }
 
-            // Create any devices that we don't have
-            foreach (var deviceInformation in deviceList.DeviceInfos)
+            // remove any Active Devices the user doesn't want
+            while(this.activeDevices.Count > nextDeviceIndex)
             {
-                if (!deviceInformation.IsChecked) continue;
-
-                if (this.HaveActiveDevice(deviceInformation.Address)) continue;
-
-                var newDevice = new ActiveDevice(deviceInformation);
-                newDevice.GetRunningProcessesOnHeartbeat = true; // maybe just do this with the selected device
-                newDevice.Log += this.LogDeviceMessage;
-                this.activeDevices.Add(newDevice);
+                var activeDevice = this.activeDevices[nextDeviceIndex];
+                await activeDevice.Close();
+                this.activeDevices.RemoveAt(nextDeviceIndex);
             }
 
             // Get the heartbeat going if we need to
@@ -102,6 +117,20 @@ namespace ExpoHelpers
                 if (d.Address == address) return true;
             }
             return false;
+        }
+
+        private int TryGetActiveDeviceIndex(string address)
+        {
+
+            for(int activeDeviceIndex = 0; activeDeviceIndex < this.ActiveDevices.Count; ++activeDeviceIndex)
+            {
+                var activeDevice = this.ActiveDevices[activeDeviceIndex];
+                if(activeDevice.Address == address)
+                {
+                    return activeDeviceIndex;
+                }
+            }
+            return -1;
         }
 
         private ActiveDevice[] GetActiveDeviceArray()
