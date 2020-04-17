@@ -64,11 +64,6 @@ namespace DemoAssistant
                 deviceList.LoadDeviceListFromStream(testDevicesStream);
             }
 
-            // Update the selected devices from settings.  We don't just have this
-            // in the DeviceList XML to keep it compatable with other apps that use it.
-            // May not be important...
-            deviceList.UpdateCheckedDevices(AppSettings.SelectedDevices);
-
             await this.UpdateActiveDevicesAsync();
         }
 
@@ -89,7 +84,7 @@ namespace DemoAssistant
                 deviceList.DeviceInfos[0].IsChecked = true;
             }
 
-            await activeDeviceList.UpdateActiveDevicesAsync(false);
+            await activeDeviceList.UpdateActiveDevicesAsync(deviceList.DeviceInfos);
         }
 
         protected override void OnStart()

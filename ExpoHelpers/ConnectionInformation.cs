@@ -23,5 +23,10 @@ namespace ExpoHelpers
         public string UserName;
 
         public string Password;
+
+        /// <summary>
+        /// Checked devices are shown in the main UI
+        /// </summary>
+        public bool IsChecked;
     }
 }

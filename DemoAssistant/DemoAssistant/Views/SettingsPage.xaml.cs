@@ -171,9 +171,8 @@ namespace DemoAssistant.Views
             deviceList.ReplaceDeviceList(this.allDevices);
             AppSettings.DeviceListString = deviceList.GetDeviceListString();
 
-            AppSettings.SelectedDevices = deviceList.GetCheckedDevicesString();
             var activeDeviceList = DependencyService.Get<ActiveDeviceList>();
-            await activeDeviceList.UpdateActiveDevicesAsync(false);
+            await activeDeviceList.UpdateActiveDevicesAsync(deviceList.DeviceInfos);
 
             if(this.TrainingApplication != null)
             {

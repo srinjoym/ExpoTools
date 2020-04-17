@@ -31,13 +31,6 @@ namespace ExpoHelpers
             set { SetLocalSetting(ref deviceListString, value); }
         }
 
-        private static string selectedDevices = string.Empty;
-        public static string SelectedDevices
-        {
-            get { GetLocalSetting(out selectedDevices, string.Empty); return selectedDevices; }
-            set { SetLocalSetting(ref selectedDevices, value); }
-        }
-
         private static string defaultUserName = string.Empty;
         public static string DefaultUserName
         {

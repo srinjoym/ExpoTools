@@ -36,12 +36,10 @@ namespace ExpoHelpers
             this.ActiveDevices = new ReadOnlyObservableCollection<ActiveDevice>(this.activeDevices);
         }
 
-        public async Task UpdateActiveDevicesAsync(bool forceReset)
+        public async Task UpdateActiveDevicesAsync(IList<DeviceInformation> allDevices)
         {
-            var deviceList = DependencyService.Get<DeviceList>();
-
             int nextDeviceIndex = 0;
-            foreach(var deviceInformation in deviceList.DeviceInfos)
+            foreach(var deviceInformation in allDevices)
             {
 
                 if(deviceInformation.IsChecked)

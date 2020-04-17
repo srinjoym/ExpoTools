@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace ExpoHelpers
@@ -15,8 +13,6 @@ namespace ExpoHelpers
     /// </summary>
     public class DeviceList : NotifyPropertyChangedBase
     {
-        public const char DevicesSeperator = '|';
-
         public delegate void LogEHandler(bool isError, string message);
 
         public event LogEHandler Log;
@@ -73,16 +69,10 @@ namespace ExpoHelpers
 
         private bool TrySetDeviceList(List<ConnectionInformation> connectionInfos)
         {
-            // Do some valididty checks on the list.  Make sure all addresses are unique and that none contain a |
+            // Do some valididty checks on the list
             HashSet<string> allAddresses = new HashSet<string>();
             foreach (var connection in connectionInfos)
             {
-                if (connection.Address.Contains(DevicesSeperator))
-                {
-                    this.Log?.Invoke(true, $"Invalid data in device list file.  Device {connection.Address} contains reserved character {DevicesSeperator}");
-                    return false;
-                }
-
                 var normalizedAddress = connection.Address.ToLowerInvariant();
                 if (allAddresses.Contains(normalizedAddress))
                 {
@@ -102,6 +92,7 @@ namespace ExpoHelpers
                     Id = connection.Id,
                     UserName = connection.UserName,
                     Password = connection.Password,
+                    IsChecked = connection.IsChecked,
                 });
             }
 
@@ -123,6 +114,7 @@ namespace ExpoHelpers
                     Name = deviceInfo.Name,
                     Password = deviceInfo.Password,
                     UserName = deviceInfo.UserName,
+                    IsChecked = deviceInfo.IsChecked,
                 };
                 connectionInfos.Add(connectionInfo);
             }
@@ -131,40 +123,6 @@ namespace ExpoHelpers
             XmlSerializer serializer = new XmlSerializer(typeof(List<ConnectionInformation>));
             serializer.Serialize(stringWriter, connectionInfos);
             return stringWriter.ToString();
-        }
-
-        public string GetCheckedDevicesString()
-        {
-            var sb = new StringBuilder();
-            foreach (var item in this.DeviceInfos)
-            {
-                if (item.IsChecked)
-                {
-                    sb.Append(item.Address);
-                    sb.Append(DevicesSeperator);
-                }
-            }
-
-            if (sb.Length > 0)
-            {
-                // remove the extra seperator
-                sb.Remove(sb.Length - 1, 1);
-            }
-
-            return sb.ToString();
-        }
-
-        public void UpdateCheckedDevices(string settingsString)
-        {
-            if (!string.IsNullOrEmpty(settingsString))
-            {
-                var addresses = settingsString.Split(DevicesSeperator);
-                foreach (var item in this.DeviceInfos)
-                {
-                    string address = addresses.FirstOrDefault((s) => (item.Address == s));
-                    item.IsChecked = (address != default(string));
-                }
-            }
         }
 
         public int GetCheckedDevicesCount()
