@@ -34,10 +34,19 @@ namespace ExpoHelpers
                 XmlSerializer serializer = new XmlSerializer(typeof(List<ConnectionInformation>));
                 connectionInfos = serializer.Deserialize(new StringReader(deviceListXml)) as List<ConnectionInformation>;
             }
-            catch(InvalidOperationException e)
+            catch(Exception e)
             {
-                this.Log?.Invoke(true, "Unable to read device list string\r\n" + e.InnerException.Message);
-                return;
+                if (e is InvalidOperationException)
+                {
+                    this.Log?.Invoke(true, "Unable to read device list string\r\n" + e.InnerException.Message);
+                    return;
+                }
+                else if (e is FormatException)
+                {
+                    this.Log?.Invoke(true, "Unable to read device list string\r\n" + e.Message);
+                    return;
+                }
+                throw;
             }
 
             this.TrySetDeviceList(connectionInfos);

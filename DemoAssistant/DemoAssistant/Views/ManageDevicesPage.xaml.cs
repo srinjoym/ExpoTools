@@ -1,4 +1,5 @@
-﻿using ExpoHelpers;
+﻿using DemoAssistant.Services;
+using ExpoHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using ZXing;
 
 namespace DemoAssistant.Views
 {
@@ -92,9 +94,34 @@ namespace DemoAssistant.Views
             }
         }
 
-        private void ScanQrClicked(object sender, EventArgs e)
+        private async void ScanQrClicked(object sender, EventArgs e)
         {
-            // TODO - should be fun!
+
+            ILoggingService log = DependencyService.Get<ILoggingService>();
+
+            var scanner = new ZXing.Mobile.MobileBarcodeScanner();
+
+            var result = await scanner.Scan();
+
+            if (result != null)
+            {
+                log.LogMessage(false, $"Read QR code.  Text length = {result.Text.Length}");
+                var list = new DeviceList();
+                list.LoadDeviceListFromString(result.Text);
+                log.LogMessage(false, $"{list.DeviceInfos.Count} connections read");
+                if (list.DeviceInfos.Count > 0)
+                {
+                    this.Devices.Clear();
+                    foreach (var info in list.DeviceInfos)
+                    {
+                        this.Devices.Add(info);
+                    }
+                }
+            }
+            else
+            {
+                log.LogMessage(false, "No QR code read");
+            }
         }
     }
 }
