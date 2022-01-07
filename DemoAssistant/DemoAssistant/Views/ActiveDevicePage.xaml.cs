@@ -182,6 +182,11 @@ namespace DemoAssistant.Views
             await this.activeDevice.LaunchKioskModeApplicationAsync();
         }
 
+        private async void ExportMap(object sender, EventArgs args)
+        {
+            await this.activeDevice.ExportMap();
+        }
+
         private async void LaunchTrainingAppClick(object sender, EventArgs args)
         {
             await this.LaunchApp(AppPackageSetting.TrainingApp);

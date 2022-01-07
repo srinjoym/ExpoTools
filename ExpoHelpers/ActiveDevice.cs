@@ -381,6 +381,11 @@ namespace ExpoHelpers
             return 0;
         }
 
+        public async Task ExportMap()
+        {
+            await this.devicePortal.ExportMapManagerFileAsync();
+        }
+
         public async Task<uint> LaunchApplicationAsync(string appId, string packageName)
         {
             using (new StatusHelper(this))
